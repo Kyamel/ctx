@@ -87,8 +87,8 @@ def _related_label(conn: sqlite3.Connection, ref: str) -> str:
 
 def _symbol_block(conn: sqlite3.Connection, row: sqlite3.Row) -> list[str]:
     """Render one symbol section, including tags, relations and documentation."""
-    loc = f"{row['file_path']}:{row['start_line']}-{row['end_line']}"
-    lines = [f"### `{row['qualified_name']}` ({row['kind']})", f"- location: `{loc}`"]
+    loc = f"{row['file_path']}:{row['start_line']}"
+    lines = [f"### `{row['qualified_name']}` ({row['kind']})", f"- location: ({loc})"]
     if row["signature"]:
         lines.append(f"- signature: `{row['signature']}`")
     tags = tags_for_symbol(conn, row["id"])

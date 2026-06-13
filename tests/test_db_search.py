@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from ctx import db
+from ctx.context.builder import build_markdown
 from ctx.context.search import build_match_query, search
 from ctx.models import ContextNote, Symbol
 
@@ -54,4 +55,18 @@ def test_fts_search_finds_symbols_and_notes(project: Path, config):
     hits = search(conn, "tokens", limit=10)
     kinds = {h.row_type for h in hits}
     assert "symbol" in kinds and "note" in kinds
+    conn.close()
+
+
+def test_context_symbol_locations_use_clickable_start_line_only(project: Path, config):
+    conn = db.connect(config.db_path)
+    db.upsert_symbol(conn, _symbol("scanner", "extracts symbols"))
+    db.rebuild_fts(conn)
+    conn.commit()
+
+    hits = search(conn, "scanner", limit=10)
+    markdown = build_markdown(conn, "scanner", hits)
+
+    assert "- location: (a.py:1)" in markdown
+    assert "a.py:1-2" not in markdown
     conn.close()
