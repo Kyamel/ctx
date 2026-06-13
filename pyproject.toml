@@ -1,0 +1,45 @@
+[project]
+name = "ctx"
+version = "0.1.0"
+description = "Local active project-memory CLI: scans source, extracts symbols/docs, tracks changes, builds compact Markdown context for AI tools."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "ctx" }]
+dependencies = [
+    "typer>=0.12",
+    "rich>=13.7",
+    "pydantic>=2.7",
+    "tree-sitter>=0.21",
+]
+
+[project.scripts]
+ctx = "ctx.cli:app"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ctx"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Typer relies on function-call defaults (typer.Argument/Option) by design.
+"src/ctx/cli.py" = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
